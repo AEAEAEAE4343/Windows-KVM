@@ -1,7 +1,7 @@
 # Windows/KVM
 ### Before I begin
 
-I need to say I don't know the specifics on Intel. I namely don't know what CPU model you need to use on unsupported CPU's. I couldn't find Comet Lake in the cpu-map from QEMU and I don't know the list of CPU features myself. If anyone can supply this information it would be appreciated. **If your CPU is supported you can still use this guide.**'
+I need to say I don't know the specifics on Intel. I namely don't know what CPU model you need to use on unsupported CPU's. I couldn't find Comet Lake in the cpu-map from QEMU and I don't know the list of CPU features myself. If anyone can supply this information it would be appreciated. **If your CPU is supported you can still use this guide.**
 
 ### Install Windows 11 on unsupported hardware using KVM/Linux
 
