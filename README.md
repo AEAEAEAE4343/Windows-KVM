@@ -40,13 +40,16 @@ We use Linux because it's extremely configurable but not too expansive. We can s
 
 Before committing to anything, make sure your PC will actually be able to run Windows 11 smoothly. If it can't run Windows 11 natively, it won't be able to run Windows 11 in a Virtual Machine either.
 
+Your CPU must have at least the performance requirements (1 Ghz, 2 cores) met. Otherwise Windows 11 will run like crap on your PC.
+
 You have to enable VT-x for Intel processors or SVM for AMD processors in your BIOS. **You can not use KVM without VT-x or SVM.** Please look it up on Google: `[Motherboard name] how to enable virtualization`
 
 Also, you'll need a couple of hours. Installing and deploying a setup like this has a lot of steps and those steps take time. Also, you might need to troubleshoot some stuff, so count on it taking about 2-3 hours total. Note that you can pause at any moment, you're not playing an online match of CS:GO.
 
 ## Partitioning your disk
 
-This step can vary. A lot. You'll have to look up how to partition a computer yourself. For Linux + KVM + Windows 11, I recommend the following based on what disk configuration you have:
+This step can vary. A lot. Unfortunately this step can also be pretty complicated depending on what you already have and what you want to do. You'll have to look up how to partition a computer yourself. Refrain from using Disk Manager in Windows, use DiskPart instead. If you really can't work with the DiskPart command-line, use a dedicated partition tool like EaseUS Partition Master, MiniTool Partition Wizard or similar tools.
+As for the layout itself, for Windows/KVM I recommend the following based on what disk configuration you have:
 
 ---
  - **128/256GB SSD + 1TB or more HDD\***
@@ -131,7 +134,9 @@ For AMD replace it with the following:
 
     <cpu mode="custom" match="exact" check="none">
       <model fallback="forbid">EPYC-Rome</model>
-      <feature policy="disable" name="svm"/>
+      <feature policy="disable" name="svm"/> 
+      <!-- Set policy to "enable" if you want to use WSL or other virtualization tools inside the VM. -->
+      <!-- Note that this requires you to enable nested virtualization in KVM. Look up how on Google. -->
       <topology sockets='1' cores='x' threads='x'/>
     </cpu>
 For Intel replace it with the following:
@@ -190,6 +195,8 @@ sudo mkdir -r /etc/libvirt/hooks/qemu.d/[Insert VM name]/release/end/
 ---
 Now you'll want to create your start script. Run:
 ```
+sudo touch /etc/libvirt/hooks/qemu.d/[Insert VM name]/prepare/begin/start.sh
+sudo chmod +x /etc/libvirt/hooks/qemu.d/[Insert VM name]/prepare/begin/start.sh
 sudo nano /etc/libvirt/hooks/qemu.d/[Insert VM name]/prepare/begin/start.sh
 ```
 Here you'll need to do the following:
@@ -229,6 +236,8 @@ Press Ctrl+X and type Y and then press Enter to save and quit Nano.
 ---
 Now you'll want to create your stop script. Run:
 ```
+sudo touch /etc/libvirt/hooks/qemu.d/[Insert VM name]/release/end/revert.sh
+sudo chmod +x /etc/libvirt/hooks/qemu.d/[Insert VM name]/release/end/revert.sh
 sudo nano /etc/libvirt/hooks/qemu.d/[Insert VM name]/release/end/revert.sh
 ```
 Here you'll need to do the following:
@@ -299,3 +308,14 @@ Undo the last steps you did until the VM boots again. This will help you determi
 
 ---
 You can always ask for help on the Issues page.
+
+# Credits
+
+https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF
+<br>Extensive guide on PCI passthrough
+
+https://github.com/joeknock90/Single-GPU-Passthrough
+<br>Very clean guide for passing through a single GPU.
+
+https://github.com/PassthroughPOST/VFIO-Tools
+<br>Useful libvirt hook that splits the script for each VM
